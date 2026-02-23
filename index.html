@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PdS FMN">
+<title>Prise de Service — FMN</title>
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS — Apple-grade system
+═══════════════════════════════════════ */
+:root {
+  --navy:       #001E62;
+  --navy-mid:   #0A3080;
+  --navy-light: #E8EDF8;
+  --red:        #C8102E;
+  --red-light:  #FDEAED;
+  --green:      #1A7A3C;
+  --green-light:#E6F5EC;
+  --amber:      #C97B00;
+  --amber-light:#FFF5DC;
+  --blue:       #006BDE;
+  --blue-light: #E5F0FF;
+  --teal:       #005F73;
+  --teal-light: #E0F2F5;
+
+  --bg:         #F2F4F8;
+  --surface:    #FFFFFF;
+  --surface2:   #F7F8FA;
+  --border:     rgba(0,0,0,.08);
+  --border2:    rgba(0,0,0,.05);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.07);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,.14), 0 4px 12px rgba(0,0,0,.08);
+
+  --text:       #0D1421;
+  --text2:      #3D4A5C;
+  --text3:      #7A8699;
+  --text-inv:   #FFFFFF;
+
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+
+  --tab-h:      56px;
+  --hdr-h:      100px;
+  --btm-h:      80px;
+
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ═══ RESET ═══ */
+*,*::before,*::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  background: var(--bg); color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
+
+/* ═══ LAYOUT ═══ */
+#APP { display: flex; flex-direction: column; height: 100vh; height: -webkit-fill-available; overflow: hidden; }
+
+/* ═══ HEADER ═══ */
+#HDR {
+  flex-shrink: 0;
+  background: var(--navy);
+  padding-top: calc(var(--safe-top) + 12px);
+  position: relative;
+  overflow: hidden;
+  z-index: 30;
+}
+#HDR::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #001E62 0%, #0A3080 60%, #003399 100%);
+  z-index: 0;
+}
+#HDR::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red) 0%, #FF3355 50%, var(--red) 100%);
+  z-index: 2;
+}
+.hdr-content {
+  position: relative; z-index: 1;
+  display: flex; align-items: center;
+  gap: 14px; padding: 0 18px 14px;
+}
+.hdr-badge {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(200,16,46,.4);
+}
+.hdr-title { flex: 1; min-width: 0; }
+.hdr-title h1 {
+  font-size: 17px; font-weight: 700; color: #fff;
+  letter-spacing: -.3px;
+}
+.hdr-title p {
+  font-size: 11px; color: rgba(255,255,255,.55);
+  margin-top: 1px; letter-spacing: .2px;
+}
+.hdr-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 38px; height: 38px; border: none; border-radius: 10px;
+  background: rgba(255,255,255,.12); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; cursor: pointer;
+  transition: background .15s;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.icon-btn:active { background: rgba(255,255,255,.25); transform: scale(.94); }
+
+/* ═══ PROGRESS BAR ═══ */
+#PROGRESS-WRAP {
+  position: relative; z-index: 1;
+  padding: 0 18px 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.progress-bar-bg {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,.2); overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,.7) 100%);
+  transition: width .4s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+.progress-pct {
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7);
+  min-width: 32px; text-align: right;
+}
+
+/* ═══ TABS ═══ */
+#TABS {
+  flex-shrink: 0;
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: relative; z-index: 20;
+}
+.tab {
+  flex: 1; height: var(--tab-h);
+  border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; position: relative;
+  transition: opacity .2s;
+}
+.tab-ico { font-size: 18px; transition: transform .2s; }
+.tab-lbl {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  letter-spacing: .2px; transition: color .2s;
+}
+.tab.on .tab-ico { transform: scale(1.1); }
+.tab.on .tab-lbl { color: var(--navy); font-weight: 700; }
+.tab.on::after {
+  content: '';
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 3px; border-radius: 2px;
+  background: var(--navy);
+}
+
+/* ═══ VIEWS ═══ */
+#VIEWS { flex: 1; overflow: hidden; position: relative; }
+.view {
+  position: absolute; inset: 0;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(var(--btm-h) + var(--safe-bottom) + 24px);
+  display: none;
+}
+.view.on {
+  display: block;
+  animation: viewIn .22s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ SECTION CARDS ═══ */
+.section {
+  background: var(--surface); border-radius: var(--radius-lg);
+  margin-bottom: 12px; overflow: hidden;
+  border: 1px solid var(--border2);
+  box-shadow: var(--shadow-sm);
+}
+.section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 16px; background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+}
+.section-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--navy); color: #fff;
+  font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.section-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--navy); text-transform: uppercase;
+  letter-spacing: .6px; flex: 1;
+}
+.section-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+}
+
+/* ═══ ROWS ═══ */
+.row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border2);
+  min-height: 54px;
+  transition: background .15s;
+}
+.row:last-child { border-bottom: none; }
+.row:active { background: var(--surface2); }
+.row-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.row-right { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+.row-full { flex-direction: column; align-items: flex-start; gap: 10px; }
+.row-label { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.row-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* ═══ INDICATOR DOT ═══ */
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--border); flex-shrink: 0;
+  transition: background .2s, box-shadow .2s;
+}
+.dot.ok { background: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+.dot.ko { background: var(--red); box-shadow: 0 0 0 3px var(--red-light); }
+.dot.warn { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-light); }
+.dot.info { background: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+
+/* ═══ INPUTS ═══ */
+input, select, textarea {
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  font-size: 14px; color: var(--text);
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 12px; outline: none;
+  -webkit-appearance: none; appearance: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--navy); background: var(--surface);
+  box-shadow: 0 0 0 3px var(--navy-light);
+}
+input[type=text] { min-width: 110px; max-width: 150px; }
+input[type=date] { min-width: 140px; }
+input[type=time] { min-width: 95px; }
+textarea { width: 100%; min-height: 80px; resize: vertical; line-height: 1.5; }
+select {
+  min-width: 130px; padding-right: 32px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M0.5 0.5L5 5.5L9.5 0.5' stroke='%237A8699' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+select.ok-select {
+  border-color: var(--green); background-color: var(--green-light);
+  color: var(--green); font-weight: 700;
+}
+select.ko-select {
+  border-color: var(--red); background-color: var(--red-light);
+  color: var(--red); font-weight: 700;
+}
+
+/* ═══ KVB GRID ═══ */
+.kvb-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; padding: 10px 16px 14px 38px;
+}
+.kvb-item label {
+  font-size: 10px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .5px;
+  display: block; margin-bottom: 4px;
+}
+.subsec-label {
+  font-size: 10px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .5px;
+  padding: 8px 16px 6px 38px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+
+/* ═══ HD BOX ═══ */
+.hd-display {
+  font-size: 26px; font-weight: 800; color: var(--navy);
+  background: var(--navy-light); border: 2px solid rgba(0,30,98,.2);
+  border-radius: var(--radius-sm); padding: 6px 16px;
+  letter-spacing: 3px; min-width: 96px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══ STATUS BANNER ═══ */
+.status-banner {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 16px; margin: 0 0 0;
+  font-size: 13px; font-weight: 700;
+  transition: background .3s, color .3s;
+  background: var(--surface2); color: var(--text3);
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+/* ═══ ALERT BLOCKS ═══ */
+.alert {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin: 0 16px 12px; padding: 12px 14px;
+  border-radius: var(--radius-md); font-size: 13px;
+  font-weight: 600; line-height: 1.5;
+  animation: fadeIn .2s ease;
+}
+.alert.danger { background: var(--red-light); color: var(--red); border-left: 3px solid var(--red); }
+.alert.warn   { background: var(--amber-light); color: var(--amber); border-left: 3px solid var(--amber); }
+.alert.info   { background: var(--blue-light); color: var(--blue); border-left: 3px solid var(--blue); }
+.alert.ok     { background: var(--green-light); color: var(--green); border-left: 3px solid var(--green); }
+.alert.teal   { background: var(--teal-light); color: var(--teal); border-left: 3px solid var(--teal); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══ TIMESTAMP BLOCK ═══ */
+.ts-block {
+  padding: 12px 16px 14px 38px;
+  border-bottom: 1px solid var(--border2);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.ts-lbl { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+.ts-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ts-hint { font-size: 11px; color: var(--text3); font-style: italic; }
+
+/* ═══ BUTTONS ═══ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: var(--radius-md);
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  font-weight: 700; cursor: pointer;
+  transition: transform .12s, filter .12s, box-shadow .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(.96); filter: brightness(.9); }
+.btn-primary {
+  background: var(--navy); color: #fff;
+  width: 100%; padding: 16px; font-size: 15px;
+  box-shadow: 0 4px 16px rgba(0,30,98,.3);
+  border-radius: var(--radius-md);
+}
+.btn-danger  { background: var(--red); color: #fff; flex: 1; padding: 14px 12px; font-size: 14px; }
+.btn-sec     { background: var(--surface2); color: var(--text2); flex: 1; padding: 14px 12px; font-size: 14px; border: 1px solid var(--border); }
+.btn-teal    { background: var(--teal); color: #fff; flex: 1; padding: 14px 12px; font-size: 14px; }
+.btn-sm {
+  padding: 9px 13px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 700; color: #fff; border: none; cursor: pointer;
+  transition: filter .15s, transform .1s;
+}
+.btn-sm:active { filter: brightness(.85); transform: scale(.95); }
+.btn-navy-sm { background: var(--navy-mid); }
+.btn-green-sm { background: var(--green); }
+.btn-reset-all {
+  width: 100%; background: transparent; color: var(--red);
+  border: 1.5px solid var(--red); padding: 12px;
+  font-size: 14px; font-weight: 700;
+  border-radius: var(--radius-md); cursor: pointer;
+  font-family: -apple-system, sans-serif;
+  transition: background .15s;
+}
+.btn-reset-all:active { background: var(--red-light); }
+
+/* ═══ BOTTOM BAR ═══ */
+#BTM {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px calc(12px + var(--safe-bottom));
+  display: flex; flex-direction: column; gap: 8px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+  z-index: 40;
+}
+.btn-row { display: flex; gap: 8px; }
+
+/* ═══ TOAST ═══ */
+#TOAST {
+  position: fixed; top: calc(var(--safe-top) + var(--hdr-h) + 12px);
+  left: 50%; transform: translateX(-50%) translateY(-8px);
+  padding: 11px 20px; border-radius: 24px;
+  font-size: 13px; font-weight: 700; z-index: 999;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap; max-width: 90vw; text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+#TOAST.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ═══ OVERLAY / SHEET ═══ */
+#OVL {
+  position: fixed; inset: 0;
+  background: rgba(10,20,50,.55);
+  z-index: 200; display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+#OVL.on { opacity: 1; pointer-events: all; }
+.sheet {
+  background: var(--surface); width: 100%;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 8px 20px calc(24px + var(--safe-bottom));
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.32,1,.23,1);
+  max-height: 85vh; overflow-y: auto;
+}
+#OVL.on .sheet { transform: translateY(0); }
+.sh-handle {
+  width: 36px; height: 4px; background: var(--border);
+  border-radius: 2px; margin: 10px auto 18px;
+}
+.sh-title { font-size: 18px; font-weight: 800; color: var(--navy); margin-bottom: 12px; }
+.sh-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
+.sh-body p { margin-bottom: 10px; }
+.sh-body strong { color: var(--text); }
+.sh-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.sh-ref-chip {
+  display: inline-flex; align-items: center;
+  background: var(--navy-light); color: var(--navy);
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px; margin: 2px 4px 2px 0;
+}
+
+/* ═══ HIDDEN ═══ */
+.hidden { display: none !important; }
+
+/* ═══ ERR ROW ═══ */
+.row.err { background: var(--red-light); }
+.row.err .row-label { color: var(--red); }
+
+/* ═══ SECTION SEPARATOR ═══ */
+.view-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .7px;
+  margin: 18px 4px 8px; padding: 0 4px;
+}
+
+/* ═════════════════════════════
+   CHECKLIST TAB
+═════════════════════════════ */
+.op-selector {
+  background: var(--surface); border-radius: var(--radius-lg);
+  overflow: hidden; border: 1px solid var(--border2);
+  box-shadow: var(--shadow-sm); margin-bottom: 12px;
+}
+.op-selector-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border2);
+}
+.op-selector-header h3 { font-size: 14px; font-weight: 700; color: var(--navy); }
+.op-selector-header p { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.op-pills {
+  display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap;
+}
+.op-pill {
+  padding: 9px 18px; border-radius: 22px;
+  font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+  background: var(--surface2); color: var(--text3);
+  border: 1.5px solid var(--border);
+  transition: all .15s;
+  font-family: -apple-system, sans-serif;
+}
+.op-pill.selected {
+  background: var(--navy); color: #fff; border-color: var(--navy);
+  box-shadow: 0 4px 12px rgba(0,30,98,.25);
+}
+.op-pill:active { transform: scale(.95); }
+.material-pills { display: flex; gap: 8px; padding: 0 16px 12px; }
+.mat-pill {
+  flex: 1; padding: 9px; border-radius: 10px;
+  font-size: 12px; font-weight: 700; cursor: pointer; border: none;
+  background: var(--surface2); color: var(--text3);
+  border: 1.5px solid var(--border);
+  transition: all .15s; text-align: center;
+  font-family: -apple-system, sans-serif;
+}
+.mat-pill.selected { background: var(--teal); color: #fff; border-color: var(--teal); }
+.mat-pill:active { transform: scale(.95); }
+
+.checklist-phase {
+  background: var(--surface); border-radius: var(--radius-lg);
+  overflow: hidden; border: 1px solid var(--border2);
+  box-shadow: var(--shadow-sm); margin-bottom: 12px;
+}
+.phase-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; cursor: pointer;
+  user-select: none; -webkit-user-select: none;
+  border-bottom: 1px solid var(--border2);
+}
+.phase-letter {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--navy); color: #fff;
+  font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.phase-title { flex: 1; }
+.phase-title h4 { font-size: 13px; font-weight: 700; color: var(--navy); }
+.phase-title p  { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.phase-progress {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  background: var(--surface2); padding: 3px 9px; border-radius: 14px;
+  border: 1px solid var(--border);
+}
+.phase-progress.complete { background: var(--green-light); color: var(--green); border-color: var(--green-light); }
+.phase-chevron {
+  font-size: 12px; color: var(--text3); transition: transform .2s;
+}
+.phase-header.open .phase-chevron { transform: rotate(90deg); }
+.phase-body { display: none; }
+.phase-body.open { display: block; }
+
+/* CHECKLIST ITEM */
+.cl-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border2);
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+  transition: background .1s;
+}
+.cl-item:last-child { border-bottom: none; }
+.cl-item:active { background: var(--surface2); }
+.cl-check {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+}
+.cl-check svg { opacity: 0; transition: opacity .15s; }
+.cl-item.checked .cl-check {
+  background: var(--navy); border-color: var(--navy);
+  box-shadow: 0 0 0 3px var(--navy-light);
+}
+.cl-item.checked .cl-check svg { opacity: 1; }
+.cl-item.checked .cl-text { text-decoration: line-through; color: var(--text3); }
+.cl-content { flex: 1; min-width: 0; }
+.cl-text { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.35; }
+.cl-sub  { font-size: 12px; color: var(--text3); margin-top: 3px; }
+.cl-tag  {
+  display: inline-flex; align-items: center;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 6px; margin-top: 5px; margin-right: 4px;
+}
+.tag-prereq { background: var(--amber-light); color: var(--amber); }
+.tag-naf    { background: var(--red-light); color: var(--red); }
+.tag-urgent { background: var(--red); color: #fff; }
+.tag-ref    { background: var(--navy-light); color: var(--navy); }
+
+/* Subsection */
+.cl-subsec {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .5px;
+  padding: 8px 16px 6px 52px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+
+/* Checklist global actions */
+.cl-actions {
+  display: flex; gap: 8px; margin-bottom: 12px;
+}
+.cl-action-btn {
+  flex: 1; padding: 11px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+  font-family: -apple-system, sans-serif; transition: filter .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.cl-action-btn:active { filter: brightness(.88); }
+.cl-btn-reset { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+.cl-btn-complete { background: var(--navy); color: #fff; }
+
+/* Empty checklist */
+.cl-empty {
+  text-align: center; padding: 48px 24px; color: var(--text3);
+}
+.cl-empty-ico { font-size: 48px; margin-bottom: 12px; }
+.cl-empty p { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text2); }
+.cl-empty small { font-size: 13px; line-height: 1.5; }
+
+/* ═════════════════════════════
+   POSTES TAB
+═════════════════════════════ */
+.poste-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .6px;
+  padding: 4px 4px 8px;
+}
+.poste-card {
+  background: var(--surface); border-radius: var(--radius-lg);
+  overflow: hidden; border: 1px solid var(--border2);
+  box-shadow: var(--shadow-sm); margin-bottom: 10px;
+}
+.poste-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border2);
+  cursor: pointer;
+  transition: background .1s;
+}
+.poste-row:last-child { border-bottom: none; }
+.poste-row:active { background: var(--surface2); }
+.poste-ico {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.poste-info { flex: 1; min-width: 0; }
+.poste-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.poste-details { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.poste-badge {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0;
+}
+.poste-type {
+  font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 12px;
+}
+.poste-type.sld { background: var(--teal-light); color: var(--teal); }
+.poste-type.pad { background: var(--navy-light); color: var(--navy); }
+.poste-type.av  { background: var(--amber-light); color: var(--amber); }
+
+.ref-card {
+  background: var(--surface); border-radius: var(--radius-lg);
+  padding: 16px; border: 1px solid var(--border2);
+  box-shadow: var(--shadow-sm); margin-bottom: 10px;
+}
+.ref-card h4 { font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 8px; letter-spacing: .3px; }
+.ref-article {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border2);
+}
+.ref-article:last-child { border-bottom: none; }
+.ref-code {
+  background: var(--navy); color: #fff;
+  font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;
+  flex-shrink: 0; letter-spacing: .3px;
+}
+.ref-desc { font-size: 12px; color: var(--text2); line-height: 1.45; }
+
+/* ═════════════════════════════
+   HISTORY TAB
+═════════════════════════════ */
+.hist-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.hist-header h2 { font-size: 20px; font-weight: 800; color: var(--navy); }
+.hist-count {
+  background: var(--navy); color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px;
+}
+.export-btn {
+  width: 100%; background: var(--teal); color: #fff;
+  border: none; border-radius: var(--radius-md); padding: 14px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: -apple-system, sans-serif;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(0,95,115,.25);
+  transition: filter .15s;
+}
+.export-btn:active { filter: brightness(.88); }
+.hist-card {
+  background: var(--surface); border-radius: var(--radius-lg);
+  overflow: hidden; border: 1px solid var(--border2);
+  box-shadow: var(--shadow-sm); margin-bottom: 12px;
+}
+.hist-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: var(--navy); color: #fff;
+}
+.hist-train { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.hist-date  { font-size: 11px; opacity: .6; }
+.hist-body  { padding: 12px 16px; }
+.hist-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+.hist-ci label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; display: block; margin-bottom: 2px; }
+.hist-ci span  { font-size: 12px; font-weight: 600; color: var(--text); }
+.hist-obs { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border2); font-size: 12px; color: var(--text3); font-style: italic; line-height: 1.45; }
+.badge-ok { background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; display: inline-block; }
+.badge-ko { background: var(--red-light); color: var(--red); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; display: inline-block; }
+.hist-empty { text-align: center; padding: 60px 24px; color: var(--text3); }
+.hist-empty .ei { font-size: 52px; margin-bottom: 12px; }
+.hist-empty p { font-size: 15px; font-weight: 600; color: var(--text2); }
+</style>
+</head>
+<body>
+<div id="APP">
+
+<!-- ══════════ HEADER ══════════ -->
+<div id="HDR">
+  <div class="hdr-content">
+    <div class="hdr-badge">🚄</div>
+    <div class="hdr-title">
+      <h1>Prise de Service</h1>
+      <p>FMN · Paris-Est · Conducteur SNCF</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="icon-btn" onclick="showHelp()" title="Aide &amp; Référentiel">ℹ️</button>
+    </div>
+  </div>
+  <div id="PROGRESS-WRAP">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="PROG-BAR"></div></div>
+    <div class="progress-pct" id="PROG-PCT">0%</div>
+  </div>
+</div>
+
+<!-- ══════════ TABS ══════════ -->
+<div id="TABS">
+  <button class="tab on" id="TAB-form"      onclick="goTab('form')">
+    <span class="tab-ico">📋</span><span class="tab-lbl">Formulaire</span>
+  </button>
+  <button class="tab"    id="TAB-checklist" onclick="goTab('checklist')">
+    <span class="tab-ico">✅</span><span class="tab-lbl">Checklist</span>
+  </button>
+  <button class="tab"    id="TAB-postes"    onclick="goTab('postes')">
+    <span class="tab-ico">📞</span><span class="tab-lbl">Postes</span>
+  </button>
+  <button class="tab"    id="TAB-hist"      onclick="goTab('hist')">
+    <span class="tab-ico">📊</span><span class="tab-lbl">Historique</span>
+  </button>
+</div>
+
+<!-- ══════════ VIEWS ══════════ -->
+<div id="VIEWS">
+
+  <!-- ════════ FORMULAIRE ════════ -->
+  <div id="V-form" class="view on">
+
+    <!-- 1. IDENTIFICATION -->
+    <div class="view-section-title">Identification</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title">Identification</div>
+      </div>
+      <div class="row" id="R-date">
+        <div class="row-left"><div class="dot" id="d-date"></div>
+          <div><div class="row-label">Date</div></div>
+        </div>
+        <div class="row-right"><input type="date" id="F-date" onchange="onDate()"></div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-jour"></div><div class="row-label">N° Journée</div></div>
+        <div class="row-right"><input type="text" id="F-jour" placeholder="ex: I130" maxlength="12" oninput="dotTxt('d-jour',this)"></div>
+      </div>
+      <div class="row" id="R-train">
+        <div class="row-left"><div class="dot" id="d-train"></div><div class="row-label">N° Train</div></div>
+        <div class="row-right"><input type="text" id="F-train" placeholder="ex: 795971" maxlength="12" oninput="dotTxt('d-train',this)"></div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-indice"></div><div class="row-label">Indice</div></div>
+        <div class="row-right"><input type="text" id="F-indice" placeholder="ex: 16" maxlength="8" oninput="dotTxt('d-indice',this)"></div>
+      </div>
+    </div>
+
+    <!-- 2. OPÉRATION & COMPOSITION -->
+    <div class="view-section-title">Composition</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">Opération &amp; Composition</div>
+      </div>
+      <div class="row" id="R-op">
+        <div class="row-left"><div class="dot" id="d-op"></div>
+          <div>
+            <div class="row-label">Opération</div>
+            <div class="row-sub">PC · RS · RSr · MS</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-op" onchange="dotSel('d-op',this,'any'); syncOpChecklist()">
+            <option value="">Choisir…</option>
+            <option>PC</option><option>RS</option><option>RSr</option><option>MS</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-mat">
+        <div class="row-left"><div class="dot" id="d-mat"></div>
+          <div>
+            <div class="row-label">Matériel</div>
+            <div class="row-sub">NAT · Z2N</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-mat" onchange="dotSel('d-mat',this,'any'); syncOpChecklist()">
+            <option value="">Choisir…</option>
+            <option>NAT</option><option>Z2N</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-compo">
+        <div class="row-left"><div class="dot" id="d-compo"></div>
+          <div>
+            <div class="row-label">Composition</div>
+            <div class="row-sub">US = 1 EM · UM = 2 EM</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-compo" onchange="onCompo(this)">
+            <option value="">Choisir…</option>
+            <option>US</option><option>UM</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-nem1">
+        <div class="row-left"><div class="dot" id="d-nem1"></div>
+          <div>
+            <div class="row-label" id="LBL-nem1">N° EM</div>
+            <div class="row-sub"  id="SUB-nem1">Choisir la composition d'abord</div>
+          </div>
+        </div>
+        <div class="row-right"><input type="text" id="F-nem1" placeholder="N° EM côté Paris" maxlength="12" oninput="dotTxt('d-nem1',this)"></div>
+      </div>
+      <div class="row hidden" id="R-nem2">
+        <div class="row-left"><div class="dot" id="d-nem2"></div>
+          <div>
+            <div class="row-label">N° EM côté Province</div>
+            <div class="row-sub">UM — 2ᵉ Engin Moteur</div>
+          </div>
+        </div>
+        <div class="row-right"><input type="text" id="F-nem2" placeholder="N° EM Province" maxlength="12" oninput="dotTxt('d-nem2',this)"></div>
+      </div>
+    </div>
+
+    <!-- 3. HORAIRES & LIEUX -->
+    <div class="view-section-title">Horaires &amp; Lieux</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title">Horaires &amp; Lieux</div>
+      </div>
+
+      <div class="row" id="R-dep">
+        <div class="row-left"><div class="dot" id="d-dep"></div>
+          <div>
+            <div class="row-label">Départ Prévu</div>
+            <div class="row-sub">Date + heure → calcule HD</div>
+          </div>
+        </div>
+        <div class="row-right" style="flex-direction:column;align-items:flex-end;gap:6px">
+          <input type="date" id="F-dep-d" onchange="onDep()">
+          <input type="time" id="F-dep-h" onchange="onDep()" step="60">
+        </div>
+      </div>
+
+      <div class="row" id="R-ldep">
+        <div class="row-left"><div class="dot" id="d-ldep"></div><div class="row-label">Lieu de Départ</div></div>
+        <div class="row-right">
+          <select id="F-ldep" onchange="dotSel('d-ldep',this,'any')">
+            <option value="">Choisir…</option>
+            <option>PE</option><option>PAN Z</option><option>PAN TR</option><option>PAN FV</option><option>NSY FB</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-arr"></div>
+          <div>
+            <div class="row-label">Arrivée Prévue</div>
+            <div class="row-sub">Date + heure</div>
+          </div>
+        </div>
+        <div class="row-right" style="flex-direction:column;align-items:flex-end;gap:6px">
+          <input type="date" id="F-arr-d" onchange="dotPair('d-arr','F-arr-d','F-arr-h')">
+          <input type="time" id="F-arr-h" onchange="dotPair('d-arr','F-arr-d','F-arr-h')" step="60">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-larr"></div><div class="row-label">Lieu d'Arrivée</div></div>
+        <div class="row-right">
+          <select id="F-larr" onchange="dotSel('d-larr',this,'any')">
+            <option value="">Choisir…</option>
+            <option>PE</option><option>PAN Z</option><option>PAN TR</option><option>PAN FV</option><option>NSY FB</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-hd"></div>
+          <div>
+            <div class="row-label">HD — Heure de Départ</div>
+            <div class="row-sub" id="HD-sub">Auto depuis Départ Prévu</div>
+          </div>
+        </div>
+        <div class="row-right"><div class="hd-display" id="HD-box">--:--</div></div>
+      </div>
+    </div>
+
+    <!-- 4. PPE SOL -->
+    <div class="view-section-title">Protection &amp; Sécurité</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title">PPE Sol</div>
+      </div>
+      <div class="row" id="R-ppesol">
+        <div class="row-left"><div class="dot" id="d-ppesol"></div><div class="row-label">PPE Sol</div></div>
+        <div class="row-right">
+          <select id="F-ppesol" onchange="dotSel('d-ppesol',this,'okko'); checkPPESol()">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert danger hidden" id="AL-eas">
+        ⚠️ PPE Sol KO — EAS hors service ! Signaler immédiatement au PC. Art. E 24.03 applicable.
+      </div>
+    </div>
+
+    <!-- 5. PPE BORD -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title">PPE Bord</div>
+      </div>
+      <div class="row" id="R-sigav">
+        <div class="row-left"><div class="dot" id="d-sigav"></div>
+          <div>
+            <div class="row-label">Signalisation d'avant</div>
+            <div class="row-sub">Art. D 21.01 — vérification obligatoire</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-sigav" onchange="dotSel('d-sigav',this,'okko'); checkPPEBord()">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="subsec-label">Dispositifs de sécurité</div>
+      <div class="kvb-grid">
+        <div class="kvb-item"><label>VA</label>
+          <select id="F-va" onchange="dotSel('',this,'okko'); checkPPEBord()">
+            <option value="">—</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+        <div class="kvb-item"><label>KVB</label>
+          <select id="F-kvb" onchange="dotSel('',this,'okko'); checkPPEBord()">
+            <option value="">—</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+        <div class="kvb-item"><label>RST</label>
+          <select id="F-rst" onchange="dotSel('',this,'okko'); checkPPEBord()">
+            <option value="">—</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-eas">
+        <div class="row-left"><div class="dot" id="d-eas"></div>
+          <div>
+            <div class="row-label">EAS Bord</div>
+            <div class="row-sub">Essai Automatique de Sécurité</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-eas" onchange="dotSel('d-eas',this,'okko'); checkPPEBord()">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="status-banner" id="BAN-ppe">
+        <div class="status-dot"></div>
+        <span id="BAN-ppe-t">PPE Bord — En attente de saisie</span>
+      </div>
+    </div>
+
+    <!-- 6. SERVICE TRAIN D 13.03 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div class="section-title">ST — Service Train</div>
+        <span class="section-badge" style="background:var(--navy-light);color:var(--navy);font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px">Art. D 13.03</span>
+      </div>
+      <div class="row" id="R-portes">
+        <div class="row-left"><div class="dot" id="d-portes"></div><div class="row-label">Portes</div></div>
+        <div class="row-right">
+          <select id="F-portes" onchange="dotSel('d-portes',this,'okko'); checkST()">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-ordres">
+        <div class="row-left"><div class="dot" id="d-ordres"></div>
+          <div>
+            <div class="row-label">Remise d'ordres</div>
+            <div class="row-sub">Bulletins &amp; ordres concernant le train — Art. D 25.02</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-ordres" onchange="dotSel('d-ordres',this,'okko'); checkST()">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-annonce">
+        <div class="row-left"><div class="dot" id="d-annonce"></div><div class="row-label">Annonce sonore</div></div>
+        <div class="row-right">
+          <select id="F-annonce" onchange="dotSel('d-annonce',this,'okko'); checkST()">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="status-banner" id="BAN-st">
+        <div class="status-dot"></div>
+        <span id="BAN-st-t">Service Train — En attente de saisie</span>
+      </div>
+    </div>
+
+    <!-- 7. RELÈVE D 25.02 -->
+    <div class="view-section-title">Relève de Conducteur</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <div class="section-title">Relève — Art. D 25.02</div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-gsmgfu"></div>
+          <div>
+            <div class="row-label">GSM-GFU initialisé</div>
+            <div class="row-sub">Au plus tard à la gare origine du 1er train</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-gsmgfu" onchange="dotSel('d-gsmgfu',this,'okko')">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-carnbord"></div>
+          <div>
+            <div class="row-label">Carnet de Bord consulté</div>
+            <div class="row-sub">Art. E 23.07 — à la première occasion favorable</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-carnbord" onchange="dotSel('d-carnbord',this,'okko')">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-surcharge"></div>
+          <div>
+            <div class="row-label">SURCHARGE commandée</div>
+            <div class="row-sub">Lors du desserrage — Art. D 25.02</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-surcharge" onchange="dotSel('d-surcharge',this,'okko')">
+            <option value="">Choisir…</option><option>OK</option><option>N/A</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-odiceo"></div>
+          <div>
+            <div class="row-label">ODICEO</div>
+            <div class="row-sub">Art. E 41.01 — activation &amp; ordre traité</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-odiceo" onchange="dotSel('d-odiceo',this,'any'); checkOdiceo()">
+            <option value="">Choisir…</option>
+            <option>Activé</option><option>Non équipé</option><option>Ordre en cours</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert info hidden" id="AL-odiceo">
+        📱 Ordre ODICEO en cours — Aviser le SGC. S'activer sur SIRIUS ou smartphone professionnel. Traiter l'ordre. Art. E 41.01.
+      </div>
+    </div>
+
+    <!-- 8. AuM -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <div class="section-title">AuM — Autorisation de Mouvement</div>
+        <span class="section-badge" style="background:var(--navy-light);color:var(--navy);font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px">Art. D 13.01</span>
+      </div>
+      <div class="row" id="R-aum">
+        <div class="row-left"><div class="dot" id="d-aum"></div><div class="row-label">Type d'AuM</div></div>
+        <div class="row-right">
+          <select id="F-aum" onchange="dotSel('d-aum',this,'any')">
+            <option value="">Choisir…</option>
+            <option>AuM Signal</option><option>AuM Lili</option><option>AuM Verbale</option><option>AuM Écrite</option><option>AuM à Main</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. SIRIUS & VAE -->
+    <div class="view-section-title">SIRIUS &amp; Vigilance</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <div class="section-title">SIRIUS &amp; VAE</div>
+      </div>
+      <div class="row" id="R-smc">
+        <div class="row-left"><div class="dot" id="d-smc"></div><div class="row-label">SIRIUS Mode Conduite</div></div>
+        <div class="row-right">
+          <select id="F-smc" onchange="dotSel('d-smc',this,'ouinon')">
+            <option value="">Choisir…</option><option>Oui</option><option>Non</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="R-sad">
+        <div class="row-left"><div class="dot" id="d-sad"></div>
+          <div>
+            <div class="row-label">SIRIUS Adhérence Dégradée</div>
+            <div class="row-sub">Art. D 24.04</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-sad" onchange="dotSel('d-sad',this,'ouinon'); checkSiriusAD()">
+            <option value="">Choisir…</option><option>Oui</option><option>Non</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert warn hidden" id="AL-sirius">
+        ⚠️ Adhérence Dégradée — Mesures FMN applicables. Réduire vitesse. Signaler au régulateur. Art. D 24.04.
+      </div>
+      <div class="row" id="R-vae">
+        <div class="row-left"><div class="dot" id="d-vae"></div>
+          <div>
+            <div class="row-label">VAE</div>
+            <div class="row-sub" id="VAE-ts-txt">Non horodatée</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-vae" onchange="dotSel('d-vae',this,'ouinon'); onVAE()">
+            <option value="">Choisir…</option><option>Oui</option><option>Non</option>
+          </select>
+        </div>
+      </div>
+      <div class="ts-block hidden" id="VAE-ts-block">
+        <div class="ts-lbl">⏱ Horodatage VAE <span style="font-weight:400;color:var(--text3);text-transform:none">(optionnel)</span></div>
+        <div class="ts-row">
+          <button class="btn-sm btn-navy-sm" onclick="tsAuto('VAE')">⏱ Auto</button>
+          <input type="date" id="F-vae-d" style="min-width:135px" onchange="tsPreview('VAE')">
+          <input type="time" id="F-vae-h" style="min-width:85px"  onchange="tsPreview('VAE')" step="60">
+          <button class="btn-sm btn-green-sm" onclick="tsApply('VAE')">✓ Appliquer</button>
+        </div>
+        <div class="ts-hint" id="VAE-ts-hint">Saisir l'heure exacte de la VAE</div>
+      </div>
+      <div class="alert teal hidden" id="AL-oae">
+        ✅ OAE applicable — Ordre d'Arrêt d'Exception. Notifier l'agent-circulation.
+      </div>
+      <!-- VA en marche D 25.02 -->
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-vamarche"></div>
+          <div>
+            <div class="row-label">Essai VA en marche</div>
+            <div class="row-sub">Au démarrage — Art. D 25.02 obligatoire</div>
+          </div>
+        </div>
+        <div class="row-right">
+          <select id="F-vamarche" onchange="dotSel('d-vamarche',this,'okko')">
+            <option value="">Choisir…</option><option>OK</option><option>KO</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. ARRIVÉE EFFECTIVE -->
+    <div class="view-section-title">Fin de Service</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div class="section-title">Arrivée Effective &amp; Observations</div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-arreff"></div>
+          <div>
+            <div class="row-label">Arrivée Effective</div>
+            <div class="row-sub" id="ARR-ts-txt">Non horodatée</div>
+          </div>
+        </div>
+        <div class="row-right"><button class="btn-sm btn-navy-sm" onclick="tsAuto('ARR')">⏱ Auto</button></div>
+      </div>
+      <div class="ts-block">
+        <div class="ts-lbl">✏️ Saisie manuelle</div>
+        <div class="ts-row">
+          <input type="date" id="F-arr-ts-d" style="min-width:135px" onchange="tsPreview('ARR')">
+          <input type="time" id="F-arr-ts-h" style="min-width:85px"  onchange="tsPreview('ARR')" step="60">
+          <button class="btn-sm btn-green-sm" onclick="tsApply('ARR')">✓ Appliquer</button>
+        </div>
+        <div class="ts-hint" id="ARR-ts-hint">Heure d'arrivée effective (optionnel)</div>
+      </div>
+      <div class="row row-full">
+        <div class="row-label">📝 Observations</div>
+        <textarea id="F-obs" placeholder="Consigner tout incident, anomalie ou renseignement à transmettre…"></textarea>
+      </div>
+    </div>
+
+    <!-- 11. REX & DOC ADC -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <div class="section-title">REX &amp; Document ADC</div>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-rex"></div><div class="row-label">REX</div></div>
+        <div class="row-right">
+          <select id="F-rex" onchange="dotSel('d-rex',this,'any'); checkRex()">
+            <option value="">Choisir…</option><option>Oui</option><option>Non</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert info hidden" id="AL-rex">
+        📎 REX activé — Joindre la pièce justificative au rapport.
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="dot" id="d-docadc"></div><div class="row-label">Document ADC émarginé</div></div>
+        <div class="row-right">
+          <select id="F-docadc" onchange="dotSel('d-docadc',this,'any'); checkDocADC()">
+            <option value="">Choisir…</option><option>Oui</option><option>Non</option>
+          </select>
+        </div>
+      </div>
+      <div class="row hidden" id="R-docnum">
+        <div class="row-left"><div class="dot" id="d-docnum"></div><div class="row-label">N° Document émarginé</div></div>
+        <div class="row-right"><input type="text" id="F-docnum" placeholder="Numéro" maxlength="20" oninput="dotTxt('d-docnum',this)"></div>
+      </div>
+    </div>
+
+    <div style="height:8px"></div>
+
+  </div><!-- /V-form -->
+
+  <!-- ════════ CHECKLIST ════════ -->
+  <div id="V-checklist" class="view">
+
+    <!-- Sélecteur Opération / Matériel -->
+    <div class="op-selector">
+      <div class="op-selector-header">
+        <h3>🔧 Procédure Technique</h3>
+        <p>Sélectionner l'opération et le matériel</p>
+      </div>
+      <div class="op-pills">
+        <button class="op-pill" id="CL-PC"  onclick="selectCLOp('PC')">PC</button>
+        <button class="op-pill" id="CL-RS"  onclick="selectCLOp('RS')">RS</button>
+        <button class="op-pill" id="CL-RSr" onclick="selectCLOp('RSr')">RSr</button>
+        <button class="op-pill" id="CL-MS"  onclick="selectCLOp('MS')">MS</button>
+      </div>
+      <div class="material-pills">
+        <button class="mat-pill" id="MAT-NAT" onclick="selectMat('NAT')">NAT</button>
+        <button class="mat-pill" id="MAT-Z2N" onclick="selectMat('Z2N')">Z2N</button>
+      </div>
+    </div>
+
+    <!-- Actions checklist -->
+    <div class="cl-actions" id="CL-ACTIONS" style="display:none">
+      <button class="cl-action-btn cl-btn-reset"    onclick="resetChecklist()">🔄 Réinitialiser</button>
+      <button class="cl-action-btn cl-btn-complete" onclick="completeAll()">✓ Tout cocher</button>
+    </div>
+
+    <!-- Checklist content -->
+    <div id="CL-CONTENT">
+      <div class="cl-empty">
+        <div class="cl-empty-ico">📋</div>
+        <p>Aucune opération sélectionnée</p>
+        <small>Choisir l'opération et le type de matériel<br>pour afficher la procédure technique.</small>
+      </div>
+    </div>
+
+  </div><!-- /V-checklist -->
+
+  <!-- ════════ POSTES ════════ -->
+  <div id="V-postes" class="view">
+
+    <div class="view-section-title">Contacts Paris-Est</div>
+    <div class="poste-card">
+      <div class="poste-row" onclick="copyPoste('PE · PAD / Poste 1 / Superviseur')">
+        <div class="poste-ico" style="background:var(--navy-light)">🏢</div>
+        <div class="poste-info">
+          <div class="poste-name">Paris-Est (PE)</div>
+          <div class="poste-details">PAD · Poste 1 · Superviseur</div>
+        </div>
+        <div class="poste-badge">
+          <div class="poste-type pad">PAD</div>
+        </div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('PAN Z · SLD / Poste Z / Coordinateur')">
+        <div class="poste-ico" style="background:var(--blue-light)">🔵</div>
+        <div class="poste-info">
+          <div class="poste-name">PAN Z</div>
+          <div class="poste-details">SLD · Poste Z · Coordinateur</div>
+        </div>
+        <div class="poste-badge">
+          <div class="poste-type sld">SLD</div>
+        </div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('PAN TR · Auto Verbale / Poste B1 / APT')">
+        <div class="poste-ico" style="background:var(--amber-light)">🟡</div>
+        <div class="poste-info">
+          <div class="poste-name">PAN TR</div>
+          <div class="poste-details">Auto Verbale · Poste B1 · APT</div>
+        </div>
+        <div class="poste-badge">
+          <div class="poste-type av">AV</div>
+        </div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('PAN FV · Auto Verbale / Poste B7 / Coordinateur')">
+        <div class="poste-ico" style="background:var(--amber-light)">🟡</div>
+        <div class="poste-info">
+          <div class="poste-name">PAN FV</div>
+          <div class="poste-details">Auto Verbale · Poste B7 · Coordinateur</div>
+        </div>
+        <div class="poste-badge">
+          <div class="poste-type av">AV</div>
+        </div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('NSY FB · SLD / Poste FB / GEOPS')">
+        <div class="poste-ico" style="background:var(--teal-light)">🟢</div>
+        <div class="poste-info">
+          <div class="poste-name">NSY FB</div>
+          <div class="poste-details">SLD · Poste FB · GEOPS</div>
+        </div>
+        <div class="poste-badge">
+          <div class="poste-type sld">SLD</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-section-title">Contacts Cantons</div>
+    <div class="poste-card">
+      <div class="poste-row" onclick="copyPoste('C21/22 · Poste de Château-Landon')">
+        <div class="poste-ico" style="background:var(--surface2)">🏠</div>
+        <div class="poste-info">
+          <div class="poste-name">C21 / C22</div>
+          <div class="poste-details">Poste de Château-Landon</div>
+        </div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('C2XX · B1')">
+        <div class="poste-ico" style="background:var(--surface2)">📍</div>
+        <div class="poste-info"><div class="poste-name">C2XX</div><div class="poste-details">B1</div></div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('C3XX · B7')">
+        <div class="poste-ico" style="background:var(--surface2)">📍</div>
+        <div class="poste-info"><div class="poste-name">C3XX</div><div class="poste-details">B7</div></div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('C47X · Poste G')">
+        <div class="poste-ico" style="background:var(--surface2)">📍</div>
+        <div class="poste-info"><div class="poste-name">C47X</div><div class="poste-details">Poste G</div></div>
+      </div>
+      <div class="poste-row" onclick="copyPoste('BPL(FIEF) · C21/22 Château-Landon')">
+        <div class="poste-ico" style="background:var(--navy-light)">🔑</div>
+        <div class="poste-info">
+          <div class="poste-name">BPL(FIEF)</div>
+          <div class="poste-details">C21/22 → Château-Landon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-section-title">Articles du Référentiel</div>
+    <div class="ref-card">
+      <h4>📖 Prise de Service</h4>
+      <div class="ref-article">
+        <div class="ref-code">D 25.02</div>
+        <div class="ref-desc">Opérations par le conducteur prenant — relève, bulletins, ordres, GSM-GFU, SURCHARGE, VA en marche.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">E 24.03</div>
+        <div class="ref-desc">Détermination de l'opération technique (PC, RS, RSr, MS). Signalisation de protection sur EM.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">E 23.07</div>
+        <div class="ref-desc">Carnet de bord — consultation à la première occasion favorable.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">D 13.03</div>
+        <div class="ref-desc">Service du train — portes, remise d'ordres, annonce.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">D 21.01</div>
+        <div class="ref-desc">Signalisation d'avant des trains — vérification obligatoire en prise de service.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">E 41.01</div>
+        <div class="ref-desc">ODICEO — gestion des ordres, activation sur SIRIUS ou smartphone professionnel.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">D 24.04</div>
+        <div class="ref-desc">Adhérence dégradée — patinages, enrayages. Mesures FMN.</div>
+      </div>
+      <div class="ref-article">
+        <div class="ref-code">D 13.01</div>
+        <div class="ref-desc">Autorisation de Mouvement (AuM) — Signal, Lili, Verbale, Écrite, à Main.</div>
+      </div>
+    </div>
+
+    <div class="view-section-title">À propos</div>
+    <div class="section">
+      <div class="row">
+        <div class="row-left"><span style="font-size:20px">🚄</span>
+          <div>
+            <div class="row-label">Prise de Service FMN</div>
+            <div class="row-sub">Version 3.0 · Paris-Est · 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-left"><span style="font-size:20px">📘</span>
+          <div>
+            <div class="row-label">Référentiel FMN v02</div>
+            <div class="row-sub">Septembre 2025 — 318 articles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /V-postes -->
+
+  <!-- ════════ HISTORIQUE ════════ -->
+  <div id="V-hist" class="view">
+    <div class="hist-header">
+      <h2>📊 Historique</h2>
+      <span class="hist-count" id="HIST-cnt">0</span>
+    </div>
+    <button class="export-btn" onclick="exportCSV()">📤 Exporter en CSV</button>
+    <div id="HIST-list"></div>
+  </div>
+
+</div><!-- /VIEWS -->
+</div><!-- /APP -->
+
+<!-- ══════════ BOTTOM BAR ══════════ -->
+<div id="BTM">
+  <button class="btn btn-primary" onclick="valider()">✅ Valider et Enregistrer</button>
+  <div class="btn-row">
+    <button class="btn btn-danger" onclick="confirmReset()">🔄 Réinitialiser</button>
+    <button class="btn btn-sec"    onclick="goTab('hist')">📊 Historique</button>
+    <button class="btn btn-teal"   onclick="goTab('checklist')">✅ Checklist</button>
+  </div>
+</div>
+
+<!-- ══════════ OVERLAY / SHEET ══════════ -->
+<div id="OVL" onclick="ovlBg(event)">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div id="OVL-BODY"></div>
+  </div>
+</div>
+
+<!-- ══════════ TOAST ══════════ -->
+<div id="TOAST"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  CHECKLIST DATA
+// ══════════════════════════════════════════
+var CL_DATA = {
+  PC: {
+    NAT: [
+      {
+        phase: 'A', title: 'Opérations & Vérifications préalables', color: '#001E62',
+        items: [
+          { id:'a1',  t: 'Extinction LS(400)PC' },
+          { id:'a2',  t: 'MP(T-F) sur FU' },
+          { id:'a3',  t: 'BP-Q-BA' },
+          { id:'a4',  t: 'Vérifier Z(SE)LFR-LPRF sur "N"' },
+          { id:'a5',  t: 'Toucher le SIAC' },
+          { id:'a6',  t: 'Initialisation SIE' },
+          { id:'a7',  t: 'Checker configuration du train' },
+          { id:'a8',  t: 'Carnet de bord', sub:'Art. E 23.07 — noter toute anomalie', tags:['ref:E 23.07'] },
+          { id:'a9',  t: 'Checker VY(CO)Urg & VY(CO)Z au BSI' },
+          { id:'a10', t: 'Checker tous les CC et DJ(SI)' },
+          { id:'a11', t: 'Checker tous Z et Z(IS) sur "N"' },
+          { id:'a12', t: 'Checker plombages sur PLT1Z/2/3' },
+          { id:'a13', t: 'Checker tous les Z de la BL sur "ARRET"' },
+          { id:'a14', t: 'Checker Z-PT sur "0"' },
+          { id:'a15', t: 'Déverrouiller la BL' },
+          { id:'a16', t: 'Checker cli LS-SF' },
+          { id:'a17', t: 'Assurer signalisation d\'extrémité', tags:['ref:D 21.01'] },
+          { id:'a18', t: 'Checker LS-FU=1, BPL-J(0)=1, Z(CO)=1' },
+          { id:'a19', t: 'Checker signalisation via SIAC' },
+          { id:'a20', t: 'Checker GDI sur SIAC' },
+          { id:'a21', t: 'Placer et maintenir Z(TEST)LS' },
+          { id:'a22', t: 'BPL (AUT-DVR-SE) GA/DO' },
+          { id:'a23', t: 'LS(FP) GA/DO' },
+          { id:'a24', t: 'LS(MM-CL) GA/DO — BPL(FIEF)' },
+          { id:'a25', t: 'LS(SI)BA, BPL-J(0), BPL-J(ARR/AV)' },
+          { id:'a26', t: 'BP(URG)PT' },
+          { id:'a27', t: 'Relâcher Z(TEST)LS' },
+          { id:'a28', t: 'Checker KVB sur IHM CCD' },
+          { id:'a29', t: 'Checker LS(CO)FIS=1' },
+          { id:'a30', t: 'Si LS(CO)FIS=0 → mettre sur 1' },
+          { id:'a31', t: 'Commander montée PT' },
+          { id:'a32', t: 'Fermer le ou les DJ' },
+          { id:'a33', t: 'Checker LS(SI)BA=0' },
+        ]
+      },
+      {
+        phase: 'A', title: 'Dotations & Équipements cabine', color: '#001E62',
+        items: [
+          { id:'a34', t: 'Extincteurs', sub:'Vérification présence et plombage' },
+          { id:'a35', t: 'Agrès de protection' },
+          { id:'a36', t: 'Documents de bord' },
+          { id:'a37', t: 'Housse de protection' },
+          { id:'a38', t: 'Rampe amovible' },
+          { id:'a39', t: 'Agrès comble-lacune' },
+          { id:'a40', t: 'Fonctionnement de la lanterne' },
+          { id:'a41', t: 'Plombage du coffre cabine ABT1' },
+          { id:'a42', t: 'Poignée mobile d\'isolement du frein' },
+          { id:'a43', t: 'Cales anti-dérive' },
+          { id:'a44', t: 'Caisse d\'outillage' },
+          { id:'a45', t: 'Support de lanterne' },
+          { id:'a46', t: 'ATESS' },
+        ]
+      },
+      {
+        phase: 'A', title: 'Frein & EAS', color: '#001E62',
+        items: [
+          { id:'a47', t: 'Checker MA-CP à la pdr (8,2–9,7 bars)' },
+          { id:'a48', t: 'Appuyer sur BP(FIEF)' },
+          { id:'a49', t: 'Checker BP(FIEF)=1' },
+          { id:'a50', t: 'Placer MP(T-F) sur "0"' },
+          { id:'a51', t: 'Checker LS(FIS-S)=1 au BSI' },
+          { id:'a52', t: 'EAS', sub:'Essai Automatique de Sécurité' },
+          { id:'a53', t: 'Appuyer sur BP(FIEF) — NE PAS LE FAIRE', tags:['naf'] },
+          { id:'a54', t: 'Checker BP(FIEF)=0 — NE PAS LE FAIRE', tags:['naf'] },
+          { id:'a55', t: 'Essai VA', sub:'Prérequis: BP(FIEF)=1; RST KO', tags:['prereq:BP(FIEF)=1; RST KO'] },
+          { id:'a56', t: 'Essai du SAL', sub:'Prérequis: pas de circulation en face', tags:['prereq:Pas de circulation en face'] },
+          { id:'a57', t: 'Mettre en service la RST' },
+          { id:'a58', t: 'Essai de sonorisation' },
+        ]
+      }
+    ],
+    Z2N: []  // Z2N PC same as NAT PC
+  },
+  RS: {
+    NAT: [
+      {
+        phase: 'B', title: 'Mise en Service (rame sous caténaire)', color: '#0A3080',
+        items: [
+          { id:'b1',  t: 'Checker Voltmètre BA (1er déplacement)' },
+          { id:'b2',  t: 'Appuyer BP-BA et checker LS2-DJ' },
+          { id:'b3',  t: 'Si LS-BATTERIE BASSE=1 → fermer DJ rapidement', tags:['prereq:LS-BATTERIE BASSE=1'] },
+          { id:'b4',  t: 'Appuyer BP(TEST) LS' },
+          { id:'b5',  t: 'LS2(G) = 1 et LS(SNU) = 1' },
+          { id:'b6',  t: 'Toutes les lampes armoire BT = 1' },
+          { id:'b7',  t: 'LS-AUTRE CABINE UTILISEE = 1' },
+          { id:'b8',  t: 'Relâcher BP(TEST)LS et LS-ISO SECU = 0' },
+          { id:'b9',  t: 'Plombage Z(VA, RS, IS-FP, IS-KVB, IS-IS-AL, IS-SIVE) en motrice 1', sub:'Si équipé' },
+          { id:'b10', t: 'Checker LS-AUTRE CAB = 0' },
+          { id:'b11', t: 'Déverrouiller la BL' },
+          { id:'b12', t: 'Checker cli LS-SF' },
+          { id:'b13', t: 'Checker toutes les lampes=1 sauf LS-AUTRE CAB & LS-INCENDIE' },
+          { id:'b14', t: 'Checker LS(FP)=1' },
+          { id:'b15', t: 'Appuyer BP(TEST)LS en armoire BT et checker cli LS-INCENDIE' },
+          { id:'b16', t: 'Checker que le DIP est effacé' },
+          { id:'b17', t: 'Maintenir BP(MTS)' },
+          { id:'b18', t: 'Relâcher BP(MTS)' },
+          { id:'b19', t: 'Contact poste selon gare', sub:'PE: PAD/Poste 1 | PAN Z: SLD/Poste Z | PAN TR: B1/APT', tags:['ref:Postes'] },
+        ]
+      },
+      {
+        phase: 'C', title: 'Vérifications complémentaires — Compartiment BM1', color: '#005F73',
+        items: [
+          { id:'c1', t: 'Tous les CC et DJ=0' },
+          { id:'c2', t: 'Tous les Z sur "N"' },
+          { id:'c3', t: 'Checker les agrès de protection et signalisation' },
+          { id:'c4', t: 'Checker les agrès de sécurité' },
+          { id:'c5', t: 'Plombage caisse à outils' },
+        ]
+      },
+      {
+        phase: 'C', title: 'Vérifications complémentaires — Au Pupitre', color: '#005F73',
+        items: [
+          { id:'c6', t: 'ATESS (cf. Fiche de repérage)' },
+          { id:'c7', t: 'Checker CP à la pdr (7–9 bars)' },
+          { id:'c8', t: 'Placer Z(Chauffage), Z(Éclairage) = 1' },
+          { id:'c9', t: 'Checker label de réglage de la RST' },
+          { id:'c10', t: 'Appuyer sur marche RST' },
+        ]
+      },
+      {
+        phase: 'C', title: 'Mise en service frein', color: '#005F73',
+        items: [
+          { id:'c11', t: 'Mettre Z(FIEF) sur "SERRE"' },
+          { id:'c12', t: 'S\'assurer de la montée de pression sur le CF1 au mano CF' },
+          { id:'c13', t: 'Mettre le frein en service' },
+          { id:'c14', t: 'Appuyer BP(SURCHARGE)=1 et checker LS(SUR)=1', tags:['ref:D 25.02'] },
+          { id:'c15', t: 'Attendre la stabilisation de la CG (1 min)', sub:'⏱ Attendre 60 secondes minimum', tags:['prereq:Attente 1 min'] },
+          { id:'c16', t: 'Appuyer sur BP(SURCHARGE) et attendre l\'élimination (3 min)', sub:'⏱ Attendre 3 minutes', tags:['prereq:Attente 3 min'] },
+        ]
+      },
+      {
+        phase: 'D', title: 'Essais d\'appareillages — Freins', color: '#C8102E',
+        items: [
+          { id:'d1', t: 'Étanchéité CG' },
+          { id:'d2', t: 'Fonctionnement du frein automatique', sub:'Étanchéité du RE — N/A sur TM606' },
+          { id:'d3', t: '2 × BP(URG)' },
+          { id:'d4', t: 'Essai du frein continu — EAS', sub:'Essai Automatique de Sécurité' },
+        ]
+      },
+      {
+        phase: 'D', title: 'Essais d\'appareillages — Traction & Sécurité', color: '#C8102E',
+        items: [
+          { id:'d5', t: 'Essai de traction', sub:'Prérequis: Z(FIEF)=1; CG 5 bars; Sens de marche', tags:['prereq:Z(FIEF)=1; CG 5bars; Sens marche'] },
+          { id:'d6', t: 'Essai VA', sub:'Prérequis: Z(FIEF)=1; CG 5 bars; Sens de marche; RST KO', tags:['prereq:Z(FIEF)=1; CG 5bars; Sens marche; RST KO'] },
+          { id:'d7', t: 'Essai du KVB', sub:'Prérequis: Z(FIEF)=1; CG 5 bars', tags:['prereq:Z(FIEF)=1; CG 5bars'] },
+          { id:'d8', t: 'Essai du SAL', sub:'Prérequis: pas de circulation en face', tags:['prereq:Pas de circulation en face'] },
+          { id:'d9', t: 'Indexer RST (N° Canal + NUTRA)' },
+          { id:'d10', t: 'Z(FIEF) sur "DESSERRE"' },
+          { id:'d11', t: 'Observer vidange CF1' },
+          { id:'d12', t: 'Dépression 1 bar à la CG' },
+        ]
+      },
+      {
+        phase: 'E', title: 'Opérations Finales', color: '#1A7A3C',
+        items: [
+          { id:'e1', t: 'Initialiser le SIVE' },
+          { id:'e2', t: 'Vérifier absence du symbole (muet) sur IHM SIAC' },
+          { id:'e3', t: 'Effectuer la mise en service nuit', sub:'Non équipée — KO' },
+          { id:'e4', t: 'Autoriser l\'ouverture/fermeture des portes' },
+          { id:'e5', t: 'Commander l\'autorisation manuelle d\'ouv des portes' },
+          { id:'e6', t: 'Appuyer BP(TEST-DF)AE-FEM & checker LS-DEFAUT AE=0' },
+          { id:'e7', t: 'Annoter le CB si nécessaire', tags:['ref:E 23.07'] },
+          { id:'e8', t: 'Appuyer BP(CO)FIS' },
+          { id:'e9', t: 'LS(CO)FIS au BSI' },
+          { id:'e10', t: 'Dépréparer la rame via SIAC' },
+          { id:'e11', t: 'Appuyer sur BP(A)BA' },
+        ]
+      }
+    ],
+    Z2N: [] // will copy NAT RS
+  },
+  RSr: { NAT: [], Z2N: [] }, // subset of RS
+  MS:  { NAT: [], Z2N: [] }
+};
+
+// RSr = phases C + D + E of RS
+function buildRSrData(src) {
+  return src.filter(function(g) { return g.phase === 'C' || g.phase === 'D' || g.phase === 'E'; })
+    .map(function(g) {
+      return Object.assign({}, g, { items: g.items.map(function(i) { return Object.assign({}, i, { id: 'rsr_'+i.id }); }) });
+    });
+}
+// MS = phases B only
+function buildMSData(src) {
+  return src.filter(function(g) { return g.phase === 'B'; })
+    .map(function(g) {
+      return Object.assign({}, g, { items: g.items.map(function(i) { return Object.assign({}, i, { id: 'ms_'+i.id }); }) });
+    });
+}
+
+// Populate derived operations
+CL_DATA.RS.Z2N  = CL_DATA.RS.NAT;
+CL_DATA.PC.Z2N  = CL_DATA.PC.NAT;
+CL_DATA.RSr.NAT = buildRSrData(CL_DATA.RS.NAT);
+CL_DATA.RSr.Z2N = CL_DATA.RSr.NAT;
+CL_DATA.MS.NAT  = buildMSData(CL_DATA.RS.NAT);
+CL_DATA.MS.Z2N  = CL_DATA.MS.NAT;
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+var TS    = { VAE: null, ARR: null };
+var STORE = 'pds_fmn_v6';
+var CL_STORE = 'pds_cl_v2';
+var isUM  = false;
+var clOp  = '';
+var clMat = '';
+var clChecked = {};   // { itemId: bool }
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+window.addEventListener('load', function() {
+  setToday('F-date');
+  setToday('F-dep-d');
+  dot('d-date', 'ok');
+  dot('d-dep', 'ok');
+  updateCount();
+  loadCLState();
+  updateProgress();
+});
+
+function setToday(id) {
+  var d = new Date(), el = g(id, true);
+  if (el) el.value = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+function goTab(t) {
+  ['form','checklist','postes','hist'].forEach(function(n) {
+    var tab  = document.getElementById('TAB-'+n);
+    var view = document.getElementById('V-'+n);
+    if (tab)  tab.classList.toggle('on', n===t);
+    if (view) view.classList.toggle('on', n===t);
+  });
+  document.getElementById('BTM').style.display = (t === 'form') ? 'flex' : 'none';
+  if (t === 'hist') renderHist();
+}
+
+// ══════════════════════════════════════════
+//  DOTS
+// ══════════════════════════════════════════
+function dot(id, state) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'dot' + (state ? ' ' + state : '');
+}
+function dotTxt(id, inp) { dot(id, inp.value ? 'ok' : ''); updateProgress(); }
+function dotSel(id, sel, mode) {
+  var v = sel.value;
+  // Colour the select
+  sel.className = sel.className.replace(/\s*(ok|ko)-select/g, '');
+  if (v==='OK'||v==='Oui') sel.classList.add('ok-select');
+  else if (v==='KO'||v==='Non') sel.classList.add('ko-select');
+  // Dot
+  if (!id) return;
+  if (mode==='okko')    dot(id, v==='OK' ? 'ok' : v==='KO' ? 'ko' : '');
+  else if (mode==='ouinon') dot(id, v==='Oui' ? 'ok' : v==='Non' ? 'ko' : '');
+  else dot(id, v ? 'ok' : '');
+  updateProgress();
+}
+function dotPair(id, dId, hId) {
+  var d = document.getElementById(dId).value;
+  var h = document.getElementById(hId).value;
+  dot(id, (d||h) ? 'ok' : '');
+}
+
+// ══════════════════════════════════════════
+//  PROGRESS BAR
+// ══════════════════════════════════════════
+var REQUIRED_FIELDS = ['F-date','F-train','F-op','F-mat','F-compo','F-nem1',
+  'F-dep-d','F-dep-h','F-ldep','F-ppesol','F-sigav','F-va','F-kvb','F-rst','F-eas',
+  'F-portes','F-ordres','F-annonce','F-aum','F-smc'];
+function updateProgress() {
+  var filled = 0;
+  REQUIRED_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.value) filled++;
+  });
+  var pct = Math.round((filled / REQUIRED_FIELDS.length) * 100);
+  document.getElementById('PROG-BAR').style.width = pct + '%';
+  document.getElementById('PROG-PCT').textContent  = pct + '%';
+}
+
+// ══════════════════════════════════════════
+//  DATE / DEP / HD
+// ══════════════════════════════════════════
+function onDate() { dot('d-date', document.getElementById('F-date').value ? 'ok' : ''); updateProgress(); }
+function onDep() {
+  var h = document.getElementById('F-dep-h').value;
+  var d = document.getElementById('F-dep-d').value;
+  dot('d-dep', (d||h) ? 'ok' : '');
+  if (h) {
+    document.getElementById('HD-box').textContent = h;
+    document.getElementById('HD-sub').textContent = 'HD = ' + h;
+    dot('d-hd', 'info');
+  } else {
+    document.getElementById('HD-box').textContent = '--:--';
+    document.getElementById('HD-sub').textContent = 'Auto depuis Départ Prévu';
+    dot('d-hd', '');
+  }
+  updateProgress();
+}
+
+// ══════════════════════════════════════════
+//  COMPOSITION
+// ══════════════════════════════════════════
+function onCompo(sel) {
+  dotSel('d-compo', sel, 'any');
+  isUM = sel.value === 'UM';
+  var r2  = document.getElementById('R-nem2');
+  var l1  = document.getElementById('LBL-nem1');
+  var s1  = document.getElementById('SUB-nem1');
+  if (sel.value === 'US') {
+    r2.classList.add('hidden');
+    document.getElementById('F-nem2').value = '';
+    l1.textContent = 'N° EM';
+    s1.textContent = 'US — engin moteur unique';
+    toast('Composition US — 1 seul N°EM', 'info');
+  } else if (sel.value === 'UM') {
+    r2.classList.remove('hidden');
+    l1.textContent = 'N° EM côté Paris';
+    s1.textContent = 'UM — 1er Engin Moteur';
+    toast('Composition UM — saisir 2 N°EM', 'info');
+  } else {
+    r2.classList.add('hidden');
+    l1.textContent = 'N° EM';
+    s1.textContent = "Choisir la composition d'abord";
+  }
+  updateProgress();
+}
+
+// ══════════════════════════════════════════
+//  CHECKS
+// ══════════════════════════════════════════
+function checkPPESol() {
+  var v = gv('F-ppesol');
+  show('AL-eas', v === 'KO');
+}
+function checkPPEBord() {
+  var ids = ['F-sigav','F-va','F-kvb','F-rst','F-eas'];
+  var anyFilled = ids.some(function(id) { return gv(id) !== ''; });
+  var allOK = ids.every(function(id) { return gv(id) === 'OK'; });
+  var ban = document.getElementById('BAN-ppe');
+  var txt = document.getElementById('BAN-ppe-t');
+  if (!anyFilled) {
+    ban.style.background = ''; ban.style.color = '';
+    txt.textContent = 'PPE Bord — En attente de saisie';
+  } else if (allOK) {
+    ban.style.background = 'var(--green-light)'; ban.style.color = 'var(--green)';
+    txt.textContent = '✅ PPE Bord — Conforme';
+  } else {
+    ban.style.background = 'var(--red-light)'; ban.style.color = 'var(--red)';
+    txt.textContent = '⚠️ PPE Bord — Vérification requise';
+  }
+  updateProgress();
+}
+function checkST() {
+  var ids = ['F-portes','F-ordres','F-annonce'];
+  var anyFilled = ids.some(function(id) { return gv(id) !== ''; });
+  var allOK = ids.every(function(id) { return gv(id) === 'OK'; });
+  var ban = document.getElementById('BAN-st');
+  var txt = document.getElementById('BAN-st-t');
+  if (!anyFilled) {
+    ban.style.background = ''; ban.style.color = '';
+    txt.textContent = 'Service Train — En attente de saisie';
+  } else if (allOK) {
+    ban.style.background = 'var(--green-light)'; ban.style.color = 'var(--green)';
+    txt.textContent = '✅ Service Train — Conforme';
+  } else {
+    ban.style.background = 'var(--red-light)'; ban.style.color = 'var(--red)';
+    txt.textContent = '⚠️ Service Train — Vérification requise';
+  }
+  updateProgress();
+}
+function checkSiriusAD() { show('AL-sirius', gv('F-sad') === 'Oui'); }
+function checkOdiceo()   { show('AL-odiceo', gv('F-odiceo') === 'Ordre en cours'); }
+function checkRex()      { show('AL-rex', gv('F-rex') === 'Oui'); }
+function checkDocADC() {
+  var v = gv('F-docadc');
+  show('R-docnum', v === 'Oui');
+  if (v !== 'Oui') { document.getElementById('F-docnum').value = ''; dot('d-docnum', ''); }
+}
+function onVAE() {
+  var v = gv('F-vae');
+  show('AL-oae',        v === 'Oui');
+  show('VAE-ts-block',  v === 'Oui');
+  if (v !== 'Oui') { TS.VAE = null; document.getElementById('VAE-ts-txt').textContent = 'Non horodatée'; }
+}
+
+// ══════════════════════════════════════════
+//  SYNC OP → CHECKLIST
+// ══════════════════════════════════════════
+function syncOpChecklist() {
+  var op  = gv('F-op');
+  var mat = gv('F-mat');
+  if (op && mat) {
+    clOp  = op;
+    clMat = mat;
+    // Update pills UI
+    ['PC','RS','RSr','MS'].forEach(function(o) {
+      document.getElementById('CL-'+o).classList.toggle('selected', o===op);
+    });
+    ['NAT','Z2N'].forEach(function(m) {
+      document.getElementById('MAT-'+m).classList.toggle('selected', m===mat);
+    });
+    renderChecklist();
+  }
+}
+
+// ══════════════════════════════════════════
+//  CHECKLIST OPERATIONS
+// ══════════════════════════════════════════
+function selectCLOp(op) {
+  clOp = op;
+  ['PC','RS','RSr','MS'].forEach(function(o) {
+    document.getElementById('CL-'+o).classList.toggle('selected', o===op);
+  });
+  // Sync back to form
+  document.getElementById('F-op').value = op;
+  dotSel('d-op', document.getElementById('F-op'), 'any');
+  renderChecklist();
+}
+function selectMat(mat) {
+  clMat = mat;
+  ['NAT','Z2N'].forEach(function(m) {
+    document.getElementById('MAT-'+m).classList.toggle('selected', m===mat);
+  });
+  // Sync back to form
+  document.getElementById('F-mat').value = mat;
+  dotSel('d-mat', document.getElementById('F-mat'), 'any');
+  renderChecklist();
+}
+function renderChecklist() {
+  var content = document.getElementById('CL-CONTENT');
+  var actions = document.getElementById('CL-ACTIONS');
+  if (!clOp || !clMat) {
+    content.innerHTML = '<div class="cl-empty"><div class="cl-empty-ico">📋</div><p>Aucune opération sélectionnée</p><small>Choisir l\'opération et le type de matériel<br>pour afficher la procédure technique.</small></div>';
+    actions.style.display = 'none';
+    return;
+  }
+  var data = (CL_DATA[clOp] && CL_DATA[clOp][clMat]) ? CL_DATA[clOp][clMat] : null;
+  // PC full = PC.NAT phases only
+  if (clOp === 'PC') { data = CL_DATA.PC.NAT; }
+  if (!data || !data.length) {
+    content.innerHTML = '<div class="cl-empty"><div class="cl-empty-ico">🔧</div><p>' + clOp + ' ' + clMat + '</p><small>Procédure identique à NAT.</small></div>';
+    actions.style.display = 'none';
+    return;
+  }
+  actions.style.display = 'flex';
+  var html = '';
+  var phaseColors = { A:'#001E62', B:'#0A3080', C:'#005F73', D:'#C8102E', E:'#1A7A3C' };
+  var phaseLabels = { A:'Opérations préalables', B:'Mise en service', C:'Vérifications complémentaires', D:'Essais d\'appareillages', E:'Opérations finales' };
+  data.forEach(function(group, gi) {
+    var done = 0, total = group.items.length;
+    group.items.forEach(function(it) { if (clChecked[it.id]) done++; });
+    var isComplete = done === total && total > 0;
+    var phaseColor = phaseColors[group.phase] || '#001E62';
+    html += '<div class="checklist-phase">';
+    html += '<div class="phase-header" id="PH-'+gi+'" onclick="togglePhase('+gi+')">';
+    html += '<div class="phase-letter" style="background:'+phaseColor+'">'+group.phase+'</div>';
+    html += '<div class="phase-title"><h4>'+esc(group.title)+'</h4><p>'+phaseLabels[group.phase]+'</p></div>';
+    html += '<div class="phase-progress'+(isComplete?' complete':'')+'">'+done+'/'+total+'</div>';
+    html += '<div class="phase-chevron">›</div>';
+    html += '</div>';
+    html += '<div class="phase-body" id="PB-'+gi+'">';
+    group.items.forEach(function(item) {
+      var checked = !!clChecked[item.id];
+      html += '<div class="cl-item'+(checked?' checked':'')+'" id="CLI-'+item.id+'" onclick="toggleItem(\''+item.id+'\','+gi+')">';
+      html += '<div class="cl-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+      html += '<div class="cl-content"><div class="cl-text">'+esc(item.t)+'</div>';
+      if (item.sub) html += '<div class="cl-sub">'+esc(item.sub)+'</div>';
+      if (item.tags) {
+        item.tags.forEach(function(tag) {
+          if (tag.startsWith('prereq:')) html += '<span class="cl-tag tag-prereq">⚡ '+esc(tag.slice(7))+'</span>';
+          else if (tag === 'naf')       html += '<span class="cl-tag tag-naf">⛔ NE PAS FAIRE</span>';
+          else if (tag === 'urgent')    html += '<span class="cl-tag tag-urgent">🔴 URGENT</span>';
+          else if (tag.startsWith('ref:')) html += '<span class="cl-tag tag-ref">📖 '+esc(tag.slice(4))+'</span>';
+        });
+      }
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+  });
+  content.innerHTML = html;
+  // Open first group by default
+  if (data.length > 0) {
+    var firstHeader = document.getElementById('PH-0');
+    var firstBody   = document.getElementById('PB-0');
+    if (firstHeader && firstBody) {
+      firstHeader.classList.add('open');
+      firstBody.classList.add('open');
+    }
+  }
+  updatePhaseProgress();
+}
+function togglePhase(gi) {
+  var h = document.getElementById('PH-'+gi);
+  var b = document.getElementById('PB-'+gi);
+  if (!h || !b) return;
+  var isOpen = b.classList.contains('open');
+  h.classList.toggle('open', !isOpen);
+  b.classList.toggle('open', !isOpen);
+}
+function toggleItem(id, gi) {
+  clChecked[id] = !clChecked[id];
+  var el = document.getElementById('CLI-'+id);
+  if (el) el.classList.toggle('checked', clChecked[id]);
+  updatePhaseProgress();
+  saveCLState();
+}
+function updatePhaseProgress() {
+  if (!clOp || !clMat) return;
+  var data = getClData();
+  if (!data) return;
+  data.forEach(function(group, gi) {
+    var done = 0, total = group.items.length;
+    group.items.forEach(function(it) { if (clChecked[it.id]) done++; });
+    var progEl = document.querySelector('#PH-'+gi+' .phase-progress');
+    if (progEl) {
+      progEl.textContent = done + '/' + total;
+      progEl.classList.toggle('complete', done === total && total > 0);
+    }
+  });
+}
+function getClData() {
+  if (!clOp || !clMat) return null;
+  if (clOp === 'PC') return CL_DATA.PC.NAT;
+  return (CL_DATA[clOp] && CL_DATA[clOp][clMat]) ? CL_DATA[clOp][clMat] : null;
+}
+function resetChecklist() {
+  clChecked = {};
+  saveCLState();
+  renderChecklist();
+  toast('Checklist réinitialisée', 'info');
+}
+function completeAll() {
+  var data = getClData();
+  if (!data) return;
+  data.forEach(function(g) { g.items.forEach(function(i) { clChecked[i.id] = true; }); });
+  saveCLState();
+  renderChecklist();
+  toast('✅ Tous les éléments cochés', 'success');
+}
+function saveCLState() {
+  try { localStorage.setItem(CL_STORE, JSON.stringify({ op: clOp, mat: clMat, checked: clChecked })); } catch(e) {}
+}
+function loadCLState() {
+  try {
+    var s = JSON.parse(localStorage.getItem(CL_STORE) || '{}');
+    if (s.op)  { clOp  = s.op;  document.getElementById('CL-'+s.op)  && document.getElementById('CL-'+s.op).classList.add('selected'); }
+    if (s.mat) { clMat = s.mat; document.getElementById('MAT-'+s.mat) && document.getElementById('MAT-'+s.mat).classList.add('selected'); }
+    if (s.checked) clChecked = s.checked;
+    if (clOp && clMat) renderChecklist();
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+//  POSTES — Copy to clipboard
+// ══════════════════════════════════════════
+function copyPoste(info) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(info).then(function() { toast('📋 Copié : ' + info, 'success'); });
+  } else {
+    toast('📋 ' + info, 'info');
+  }
+}
+
+// ══════════════════════════════════════════
+//  TIMESTAMPS
+// ══════════════════════════════════════════
+function tsAuto(w) {
+  var now = new Date(); TS[w] = now;
+  var s = fmtDT(now);
+  if (w === 'VAE') {
+    document.getElementById('F-vae-d').value = fmtD(now);
+    document.getElementById('F-vae-h').value = fmtT(now);
+    document.getElementById('VAE-ts-txt').textContent  = '⏱ ' + s;
+    document.getElementById('VAE-ts-hint').textContent = '✅ ' + s;
+    document.getElementById('VAE-ts-hint').style.color = 'var(--green)';
+  } else {
+    document.getElementById('F-arr-ts-d').value = fmtD(now);
+    document.getElementById('F-arr-ts-h').value = fmtT(now);
+    document.getElementById('ARR-ts-txt').textContent  = '⏱ ' + s;
+    document.getElementById('ARR-ts-hint').textContent = '✅ ' + s;
+    document.getElementById('ARR-ts-hint').style.color = 'var(--green)';
+    dot('d-arreff', 'ok');
+  }
+  toast('⏱ ' + w + ' : ' + s, 'success');
+}
+function tsPreview(w) {
+  var dId = w==='VAE' ? 'F-vae-d' : 'F-arr-ts-d';
+  var hId = w==='VAE' ? 'F-vae-h' : 'F-arr-ts-h';
+  var d = document.getElementById(dId).value;
+  var h = document.getElementById(hId).value;
+  if (!d || !h) return;
+  var hint = document.getElementById(w+'-ts-hint');
+  hint.textContent = '→ ' + d.split('-').reverse().join('/') + ' ' + h + ' — tap Appliquer';
+  hint.style.color = 'var(--amber)';
+}
+function tsApply(w) {
+  var dId = w==='VAE' ? 'F-vae-d' : 'F-arr-ts-d';
+  var hId = w==='VAE' ? 'F-vae-h' : 'F-arr-ts-h';
+  var d = document.getElementById(dId).value, h = document.getElementById(hId).value;
+  if (!d || !h) { toast('⚠️ Saisir date et heure', 'error'); return; }
+  var dt = new Date(d + 'T' + h); TS[w] = dt;
+  var s = fmtDT(dt);
+  document.getElementById(w+'-ts-txt').textContent  = '✏️ ' + s;
+  document.getElementById(w+'-ts-hint').textContent = '✅ ' + s;
+  document.getElementById(w+'-ts-hint').style.color = 'var(--green)';
+  if (w === 'ARR') dot('d-arreff', 'ok');
+  toast('✅ ' + w + ' : ' + s + ' appliqué', 'success');
+}
+
+// ══════════════════════════════════════════
+//  VALIDATE & SAVE
+// ══════════════════════════════════════════
+function valider() {
+  document.querySelectorAll('.row.err').forEach(function(r) { r.classList.remove('err'); });
+  var errors = [];
+  var checks = [
+    { id:'R-date',   fn:function(){return gv('F-date')!==''},    lbl:'Date' },
+    { id:'R-train',  fn:function(){return gv('F-train')!==''},   lbl:'N° Train' },
+    { id:'R-op',     fn:function(){return gv('F-op')!==''},      lbl:'Opération' },
+    { id:'R-mat',    fn:function(){return gv('F-mat')!==''},     lbl:'Matériel' },
+    { id:'R-compo',  fn:function(){return gv('F-compo')!==''},   lbl:'Composition' },
+    { id:'R-nem1',   fn:function(){return gv('F-nem1')!==''},    lbl:'N° EM' },
+    { id:'R-dep',    fn:function(){return gv('F-dep-d')!==''&&gv('F-dep-h')!==''},lbl:'Départ (date + heure)' },
+    { id:'R-ldep',   fn:function(){return gv('F-ldep')!==''},    lbl:'Lieu Départ' },
+    { id:'R-ppesol', fn:function(){return gv('F-ppesol')!==''},  lbl:'PPE Sol' },
+    { id:'R-sigav',  fn:function(){return gv('F-sigav')!==''},   lbl:'Signalisation d\'avant' },
+    { id:'R-eas',    fn:function(){return gv('F-eas')!==''},     lbl:'EAS Bord' },
+    { id:'R-portes', fn:function(){return gv('F-portes')!==''},  lbl:'Portes' },
+    { id:'R-ordres', fn:function(){return gv('F-ordres')!==''},  lbl:'Remise d\'ordres' },
+    { id:'R-annonce',fn:function(){return gv('F-annonce')!==''},  lbl:'Annonce' },
+    { id:'R-aum',    fn:function(){return gv('F-aum')!==''},     lbl:'AuM' },
+    { id:'R-smc',    fn:function(){return gv('F-smc')!==''},     lbl:'SIRIUS Mode Conduite' },
+  ];
+  checks.forEach(function(c) {
+    if (!c.fn()) { errors.push(c.lbl); if (c.id) { var el = document.getElementById(c.id); if (el) el.classList.add('err'); } }
+  });
+  if (errors.length) {
+    toast('⚠️ ' + errors.length + ' champ(s) requis : ' + errors.slice(0,3).join(', ') + (errors.length>3?' …':''), 'error');
+    // Scroll to first error
+    var firstErr = document.querySelector('.row.err');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  var entry = {
+    date:gv('F-date'), journee:gv('F-jour'), train:gv('F-train'), indice:gv('F-indice'),
+    op:gv('F-op'), mat:gv('F-mat'), compo:gv('F-compo'), nem1:gv('F-nem1'), nem2:gv('F-nem2'),
+    depD:gv('F-dep-d'), depH:gv('F-dep-h'), hd:document.getElementById('HD-box').textContent,
+    ldep:gv('F-ldep'), arrD:gv('F-arr-d'), arrH:gv('F-arr-h'), larr:gv('F-larr'),
+    arrEff: TS.ARR ? fmtDT(TS.ARR) : '',
+    ppesol:gv('F-ppesol'), sigav:gv('F-sigav'), va:gv('F-va'), kvb:gv('F-kvb'), rst:gv('F-rst'),
+    eas:gv('F-eas'),
+    gsmgfu:gv('F-gsmgfu'), carnbord:gv('F-carnbord'), surcharge:gv('F-surcharge'), odiceo:gv('F-odiceo'),
+    portes:gv('F-portes'), ordres:gv('F-ordres'), annonce:gv('F-annonce'),
+    aum:gv('F-aum'), smc:gv('F-smc'), sad:gv('F-sad'), vae:gv('F-vae'),
+    vaeTs: TS.VAE ? fmtDT(TS.VAE) : '', vamarche:gv('F-vamarche'),
+    obs:document.getElementById('F-obs').value,
+    rex:gv('F-rex'), docadc:gv('F-docadc'), docnum:gv('F-docnum'),
+    at: fmtDT(new Date())
+  };
+  var hist = loadHist();
+  hist.unshift(entry);
+  saveHist(hist);
+  toast('✅ Prise de service enregistrée', 'success');
+  updateCount();
+}
+
+// ══════════════════════════════════════════
+//  RESET
+// ══════════════════════════════════════════
+function confirmReset() {
+  showSheet('🔄 Réinitialiser',
+    '<p>Effacer tous les champs du formulaire ?</p><p>L\'historique sera conservé.</p>',
+    [
+      { lbl:'⚠️ Oui, réinitialiser', cls:'btn btn-danger', fn:'doReset(); closeSheet()' },
+      { lbl:'Annuler', cls:'btn btn-sec', fn:'closeSheet()' }
+    ]
+  );
+}
+function doReset() {
+  var ids = ['F-date','F-jour','F-train','F-indice','F-op','F-mat','F-compo','F-nem1','F-nem2',
+    'F-dep-d','F-dep-h','F-ldep','F-arr-d','F-arr-h','F-larr','F-ppesol',
+    'F-sigav','F-va','F-kvb','F-rst','F-eas','F-gsmgfu','F-carnbord','F-surcharge','F-odiceo',
+    'F-portes','F-ordres','F-annonce','F-aum','F-smc','F-sad','F-vae','F-vae-d','F-vae-h',
+    'F-arr-ts-d','F-arr-ts-h','F-obs','F-rex','F-docadc','F-docnum','F-vamarche'];
+  ids.forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  // Reset selects styling
+  document.querySelectorAll('select').forEach(function(s) {
+    s.classList.remove('ok-select','ko-select');
+  });
+  // Reset dots
+  document.querySelectorAll('.dot').forEach(function(d) { d.className = 'dot'; });
+  // Reset boxes
+  document.getElementById('HD-box').textContent = '--:--';
+  document.getElementById('HD-sub').textContent = 'Auto depuis Départ Prévu';
+  // Reset banners
+  ['BAN-ppe','BAN-st'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.background = ''; el.style.color = ''; }
+  });
+  document.getElementById('BAN-ppe-t').textContent = 'PPE Bord — En attente de saisie';
+  document.getElementById('BAN-st-t').textContent  = 'Service Train — En attente de saisie';
+  // Reset alerts
+  ['AL-eas','AL-sirius','AL-oae','AL-odiceo','AL-rex'].forEach(function(id) { show(id, false); });
+  show('R-docnum', false);
+  show('R-nem2', false);
+  show('VAE-ts-block', false);
+  // Reset timestamps
+  TS.VAE = null; TS.ARR = null;
+  document.getElementById('VAE-ts-txt').textContent  = 'Non horodatée';
+  document.getElementById('ARR-ts-txt').textContent  = 'Non horodatée';
+  document.getElementById('VAE-ts-hint').textContent = 'Saisir l\'heure exacte de la VAE';
+  document.getElementById('VAE-ts-hint').style.color = '';
+  document.getElementById('ARR-ts-hint').textContent = 'Heure d\'arrivée effective (optionnel)';
+  document.getElementById('ARR-ts-hint').style.color = '';
+  // Reset errors
+  document.querySelectorAll('.row.err').forEach(function(r) { r.classList.remove('err'); });
+  // Reset EM labels
+  isUM = false;
+  document.getElementById('LBL-nem1').textContent = 'N° EM';
+  document.getElementById('SUB-nem1').textContent = "Choisir la composition d'abord";
+  // Restore today
+  setToday('F-date'); setToday('F-dep-d');
+  dot('d-date', 'ok'); dot('d-dep', 'ok');
+  updateProgress();
+  toast('🔄 Formulaire réinitialisé', 'info');
+}
+
+// ══════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════
+function renderHist() {
+  var hist = loadHist();
+  updateCount();
+  var el = document.getElementById('HIST-list');
+  if (!hist.length) {
+    el.innerHTML = '<div class="hist-empty"><div class="ei">📋</div><p>Aucune prise de service enregistrée.</p></div>';
+    return;
+  }
+  el.innerHTML = hist.map(function(e) {
+    var ppeOK = e.sigav==='OK' && e.va==='OK' && e.kvb==='OK' && e.rst==='OK' && e.eas==='OK';
+    var stOK  = e.portes==='OK' && e.ordres==='OK' && e.annonce==='OK';
+    var d = new Date(e.date);
+    var ds = isNaN(d.getTime()) ? (e.date||'') : d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    return (
+      '<div class="hist-card">' +
+        '<div class="hist-card-head">' +
+          '<span class="hist-train">🚄 ' + esc(e.train||'—') + (e.mat?' · '+esc(e.mat):'') + '</span>' +
+          '<span class="hist-date">' + esc(ds) + '</span>' +
+        '</div>' +
+        '<div class="hist-body">' +
+          '<div class="hist-grid">' +
+            hci('Journée', e.journee) + hci('Opération', e.op) +
+            hci('Composition', e.compo) + hci('HD', e.hd) +
+            hci('N°EM Paris', e.nem1) + hci('N°EM Province', e.nem2||'—') +
+            hci('Lieu Départ', e.ldep) + hci('Lieu Arrivée', e.larr||'—') +
+            hci('AuM', e.aum) + hci('VAE', e.vae) +
+            hci('SIRIUS MC', e.smc) + hci('SIRIUS AD', e.sad) +
+            '<div class="hist-ci"><label>PPE Bord</label><span>' + badge(ppeOK?'OK':'KO') + '</span></div>' +
+            '<div class="hist-ci"><label>Service Train</label><span>' + badge(stOK?'OK':'KO') + '</span></div>' +
+          '</div>' +
+          (e.obs ? '<div class="hist-obs">💬 ' + esc(e.obs) + '</div>' : '') +
+          '<div style="margin-top:8px;font-size:10px;color:var(--text3)">Enregistré le ' + esc(e.at) + '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+function hci(l, v) { return '<div class="hist-ci"><label>'+l+'</label><span>'+esc(v||'—')+'</span></div>'; }
+function badge(v) { return '<span class="badge-'+(v==='OK'?'ok':'ko')+'">'+v+'</span>'; }
+function updateCount() {
+  var n = loadHist().length;
+  document.getElementById('HIST-cnt').textContent = n;
+}
+
+// ══════════════════════════════════════════
+//  EXPORT CSV
+// ══════════════════════════════════════════
+function exportCSV() {
+  var hist = loadHist();
+  if (!hist.length) { toast('Aucune donnée à exporter', 'error'); return; }
+  var hd = ['Date','Journée','Train','Indice','Opération','Matériel','Compo','N°EM Paris','N°EM Province',
+    'Date Départ','Heure Départ','HD','Lieu Départ','Date Arrivée','Heure Arrivée','Lieu Arrivée',
+    'Arrivée Effective','PPE Sol','Sig Avant','VA','KVB','RST','EAS',
+    'GSM-GFU','Carnet Bord','Surcharge','ODICEO',
+    'Portes','Remise Ordres','Annonce','AuM','SIRIUS MC','SIRIUS AD','VAE','Heure VAE','VA Marche',
+    'Observations','REX','DocADC','N° Doc','Enregistré le'];
+  var rows = [hd.join(';')];
+  hist.forEach(function(e) {
+    rows.push([
+      e.date, e.journee, e.train, e.indice, e.op, e.mat||'', e.compo, e.nem1, e.nem2||'',
+      e.depD, e.depH, e.hd, e.ldep, e.arrD||'', e.arrH||'', e.larr||'',
+      e.arrEff||'', e.ppesol, e.sigav, e.va, e.kvb, e.rst, e.eas,
+      e.gsmgfu||'', e.carnbord||'', e.surcharge||'', e.odiceo||'',
+      e.portes, e.ordres, e.annonce, e.aum, e.smc, e.sad, e.vae, e.vaeTs||'', e.vamarche||'',
+      (e.obs||'').replace(/;/g,','), e.rex||'', e.docadc||'', e.docnum||'', e.at
+    ].map(function(v) { return '"' + String(v||'').replace(/"/g,'""') + '"'; }).join(';'));
+  });
+  var blob = new Blob(['\uFEFF'+rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'pds_fmn_' + fmtD(new Date()).replace(/-/g,'') + '.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  toast('✅ CSV exporté', 'success');
+}
+
+// ══════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════
+var _ls = (function() { try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return true; } catch(e) { return false; } })();
+var _fb = [];
+function loadHist() { if (_ls) { try { return JSON.parse(localStorage.getItem(STORE)||'[]'); } catch(e) { return []; } } return _fb; }
+function saveHist(a) { if (_ls) { try { localStorage.setItem(STORE, JSON.stringify(a)); return; } catch(e) {} } _fb = a; }
+
+// ══════════════════════════════════════════
+//  SHEET / OVERLAY
+// ══════════════════════════════════════════
+function showSheet(title, body, btns) {
+  var html = '<div class="sh-title">'+title+'</div><div class="sh-body">'+body+'</div>' +
+    '<div class="sh-btns">'+btns.map(function(b) {
+      return '<button class="'+b.cls+'" onclick="'+b.fn+'">'+b.lbl+'</button>';
+    }).join('')+'</div>';
+  document.getElementById('OVL-BODY').innerHTML = html;
+  document.getElementById('OVL').classList.add('on');
+}
+function closeSheet() { document.getElementById('OVL').classList.remove('on'); }
+function ovlBg(e)     { if (e.target.id==='OVL') closeSheet(); }
+
+// ══════════════════════════════════════════
+//  HELP
+// ══════════════════════════════════════════
+function showHelp() {
+  showSheet('ℹ️ Aide — FMN v3',
+    '<p><strong>Voyants :</strong><br>' +
+    '<span style="color:var(--green)">● Vert</span> = OK &nbsp; ' +
+    '<span style="color:var(--red)">● Rouge</span> = KO &nbsp; ' +
+    '<span style="color:var(--blue)">● Bleu</span> = Info</p>' +
+    '<p><strong>EAS</strong> = Essai Automatique de Sécurité (anciennement EFAS)</p>' +
+    '<p><strong>HD</strong> = calculé automatiquement depuis l\'heure de départ saisie</p>' +
+    '<p><strong>Checklist</strong> — sélectionner opération + matériel pour afficher la procédure complète (PC/RS/RSr/MS × NAT/Z2N)</p>' +
+    '<p><strong>Postes</strong> — contacts des postes Paris-Est &amp; cantons. Appui = copie presse-papier.</p>' +
+    '<p><strong>D 25.02</strong> — Commander SURCHARGE au desserrage + Essai VA en marche obligatoire</p>' +
+    '<p><strong>Installer</strong> : Safari → Partager → « Sur l\'écran d\'accueil »</p>' +
+    '<p><span class="sh-ref-chip">FMN v02</span><span class="sh-ref-chip">Septembre 2025</span><span class="sh-ref-chip">Paris-Est</span></p>',
+    [{ lbl:'Fermer', cls:'btn btn-sec', fn:'closeSheet()' }]
+  );
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+var _tt;
+function toast(msg, type) {
+  var el = document.getElementById('TOAST');
+  el.textContent = msg;
+  el.style.background = type==='success'?'var(--green)':type==='error'?'var(--red)':'var(--navy-mid)';
+  el.style.color = '#fff';
+  clearTimeout(_tt);
+  el.classList.add('on');
+  _tt = setTimeout(function() { el.classList.remove('on'); }, 3500);
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function g(id, el) { var e = document.getElementById(id); return el ? e : (e ? e.value : ''); }
+function gv(id) { var e = document.getElementById(id); return e ? e.value : ''; }
+function show(id, v) { var el = document.getElementById(id); if (!el) return; el.classList.toggle('hidden', !v); }
+function pad(n) { return n < 10 ? '0'+n : ''+n; }
+function fmtD(d)  { return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function fmtT(d)  { return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function fmtDT(d) { return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+fmtT(d); }
+function esc(s)   { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
